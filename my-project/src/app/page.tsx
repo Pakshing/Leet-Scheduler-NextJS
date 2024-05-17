@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Dashboard from "../../components/Dashboard";
 
 export default function Home() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <main className="max-w-7xl mx-auto my-12 space-y-5">
+      <Dashboard/>
+    </main>
   );
 }
