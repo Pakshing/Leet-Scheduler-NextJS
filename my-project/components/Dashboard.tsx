@@ -24,7 +24,7 @@ const Dashboard = () => {
       ) : (
         <>
           <h1 className="text-3xl text-red-500 font-bold">
-            You're not logged in
+            You are not logged in
           </h1>
           <div className="flex space-x-5">
             <button
