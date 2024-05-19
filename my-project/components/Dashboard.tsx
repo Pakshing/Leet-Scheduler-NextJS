@@ -12,6 +12,7 @@ const Dashboard = () => {
         <>
           <h1 className="text-3xl text-green-500 font-bold">
             Welcome back, {session.user?.name}
+            ID: {session.user?.id}
           </h1>
           <p className="text-2xl font-semibold">{session.user?.email}</p>
           <button
