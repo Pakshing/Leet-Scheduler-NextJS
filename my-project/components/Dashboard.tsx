@@ -10,10 +10,6 @@ const Dashboard = () => {
     <>
       {session ? (
         <>
-          <img
-            src={session.user?.image as string}
-            className="rounded-full h-20 w-20"
-          ></img>
           <h1 className="text-3xl text-green-500 font-bold">
             Welcome back, {session.user?.name}
           </h1>
@@ -28,7 +24,7 @@ const Dashboard = () => {
       ) : (
         <>
           <h1 className="text-3xl text-red-500 font-bold">
-            You're not logged in
+            You are not logged in
           </h1>
           <div className="flex space-x-5">
             <button
