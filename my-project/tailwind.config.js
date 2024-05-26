@@ -12,6 +12,9 @@ module.exports = withMT( {
   ],
   theme: {
     extend: {
+      height: {
+        '7/10': '70%',
+      },
       colors: {
         'theme-color': 'rgb(26, 31, 43)',
       },

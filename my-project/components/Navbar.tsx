@@ -2,6 +2,7 @@
 import React,{useState} from 'react'
 import Image from "next/image";
 import { ClockCircleOutlined } from '@ant-design/icons';
+import Footer from './Footer';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -11,9 +12,9 @@ const Navbar = () => {
     }
   
   return (
-    <nav className=" bg-theme-color text-white *:first-letter:text-center">
+    <nav className=" bg-theme-color text-white *:first-letter:text-center h-14 sticky">
     <div className="px-8 mx-auto">
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <div className="flex space-x-4">
           {/* Logo Div */}
           <div className="logo m-3">
@@ -24,8 +25,8 @@ const Navbar = () => {
           </div>
           {/* Primary Div */}
           <div className="hidden md:flex items-center space-x-5 pr-3 ">
-            <a href="/" className="hover:text-gray-400 text-sm">About</a>
-            <a href="" className="hover:text-gray-400 text-sm">Questions</a>
+            <a href="/" className="hover:text-gray-400 text-md">About</a>
+            <a href="" className="hover:text-gray-400 text-md">Questions</a>
           </div>
         </div>
         {/* Secondary Div */}
@@ -44,9 +45,9 @@ const Navbar = () => {
     </div>
     {/* Mobile menu */}
     <div className={`mobile-menu ${isMobileMenuOpen?'':'hidden'}`}>
-      <div className="md:hidden items-center ">
-        <a href="/" className="block py-2 px-10 text-sm hover:bg-gray-200">About</a>
-        <a href="/" className="block py-2 px-10 text-sm hover:bg-gray-200">Questions</a>
+      <div className="md:hidden items-center bg-theme-color z-20">
+        <a href="/" className="block py-5 px-10 text-md hover:hover:text-gray-500">About</a>
+        <a href="/" className="block py-5 px-10 text-md hover:text-gray-500" >Questions</a>
       </div>
     </div>
     
