@@ -12,14 +12,14 @@ const Navbar = () => {
     }
   
   return (
-    <nav className=" bg-theme-color text-white *:first-letter:text-center h-14 sticky">
+    <nav className="bg-theme-color text-white *:first-letter:text-center h-16 p-1 sticky w-screen">
     <div className="px-8 mx-auto">
       <div className="flex justify-between items-center">
         <div className="flex space-x-4">
           {/* Logo Div */}
           <div className="logo m-3">
             <a href="/" className="flex items-center">
-              <ClockCircleOutlined style={{ fontSize: '1.5rem' }} />
+              <ClockCircleOutlined style={{ fontSize: '2rem' }} />
               <span className="pl-3 text-xl font-bold ">LeetCode Scheduler</span>
             </a>
           </div>
