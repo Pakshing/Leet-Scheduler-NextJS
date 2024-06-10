@@ -18,7 +18,7 @@ const OauthLoginDialog = () => {
  
   return (
     <>
-      {session?.user?(<Link href="/questions"><Button color="white">Let's grind</Button></Link> ):(   
+      {session?.user?(<Link href="/questions"><Button color="white">Start my journey</Button></Link> ):(   
         <>
       <Button onClick={handleOpen} color="white" >
         Login

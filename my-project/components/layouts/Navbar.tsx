@@ -1,8 +1,6 @@
 'use client'
 import React,{useState} from 'react'
-import Image from "next/image";
 import { ClockCircleOutlined } from '@ant-design/icons';
-import Footer from './Footer';
 import OauthLoginDialog from '../dialog/OauthLoginDialog';
 import { useSession, signOut} from 'next-auth/react';
 import { Button } from "@material-tailwind/react";
@@ -23,10 +21,10 @@ const Navbar = () => {
         <div className="flex space-x-4">
           {/* Logo Div */}
           <div className="logo m-3">
-            <a href="/" className="flex items-center">
+            <Link href="/" className="flex items-center">
               <ClockCircleOutlined style={{ fontSize: '2rem' }} />
               <span className="pl-3 text-xl font-bold ">LeetCode Scheduler</span>
-            </a>
+            </Link>
           </div>
           {/* Primary Div */}
           <div className="hidden md:flex items-center space-x-5 pr-3 ">
