@@ -1,13 +1,12 @@
 import { useState } from "react";
 import Image from "next/image";
-import Dashboard from "../../components/Dashboard";
+import { useSession } from "next-auth/react";
 
 
 import logo from "../../public/logo.png";
-import DialogButton from "../../components/dialog/DialogButton";
+import OauthLoginDialog from "../../components/dialog/OauthLoginDialog";
 
 export default function Home() {
-
 
 
   return (
@@ -17,8 +16,7 @@ export default function Home() {
             <div className="max-w-xl">
               <h1 className="font-extrabold text-4xl mb-10 ">LeetCode Scheduler</h1>
               <p className="text-xl leading-relaxed pb-10">Introducing Leetcode Scheduler! This application facilitates the tracking of your Leetcode question completions and offers scheduling based on spaced-repetition learning techniques to optimize your learning process. Embark on your journey to Leetcode mastery today!</p>
-              {/* <button className="m-4">Login</button> */}
-              <DialogButton/>
+              <OauthLoginDialog/>
             </div>
           </div>
           <div className="hidden lg:flex flex-1 items-center mr-10 rounded-lg ">

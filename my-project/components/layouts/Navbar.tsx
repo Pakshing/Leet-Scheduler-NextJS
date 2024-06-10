@@ -3,9 +3,14 @@ import React,{useState} from 'react'
 import Image from "next/image";
 import { ClockCircleOutlined } from '@ant-design/icons';
 import Footer from './Footer';
+import OauthLoginDialog from '../dialog/OauthLoginDialog';
+import { useSession, signOut} from 'next-auth/react';
+import { Button } from "@material-tailwind/react";
+import Link from 'next/link';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const {data: session} = useSession();
 
     const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -25,13 +30,13 @@ const Navbar = () => {
           </div>
           {/* Primary Div */}
           <div className="hidden md:flex items-center space-x-5 pr-3 ">
-            <a href="/" className="hover:text-gray-400 text-md">About</a>
-            <a href="" className="hover:text-gray-400 text-md">Questions</a>
+            <Link href="about"><span className="hover:text-gray-400 text-md">About</span></Link>
+            <Link href="questions"><span className="hover:text-gray-400 text-md">Questions</span></Link>           
           </div>
         </div>
         {/* Secondary Div */}
         <div className="hidden md:flex items-center space-x-1">
-          <a href="/" className="py-2 px-3 bg-yellow-200 hover:bg-yellow-300 rounded-2xl hover:text-gray-400 transition duration-300">Login</a>
+            {session ? (<Button color="white" size='sm' onClick={() => signOut()}>Logout</Button>):(<OauthLoginDialog/>)}
         </div>
         {/* Mobile Button */}
         <div className="md:hidden flex items-center">
