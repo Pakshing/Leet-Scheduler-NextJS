@@ -19,6 +19,8 @@ import {
 } from "@material-tailwind/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+
+const BASE_URL = process.env.BASE_URL;
  
 const TABS = [
   {
@@ -93,10 +95,9 @@ export function QuestionsTable() {
     // Fetch data from API
     async function fetchData() {
       console.log("Fetching data...");
-      const response = await fetch("http://localhost:3000/api/questions").then((res) => res.json());
+      const response = await fetch(BASE_URL+"/api/questions").then((res) => res.json());
     }
     fetchData();
-
   }
   , []);
   return (

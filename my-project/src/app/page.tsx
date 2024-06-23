@@ -10,7 +10,7 @@ export default function Home() {
 
 
   return (
-    <div className="bg-gray-200 h-screen">
+    <div className="flex justify-center items-center bg-gray-300 h-screen" >
         <div className="content-section m-12 w-auto h-4/5 bg-theme-color text-center flex rounded-lg">
           <div className="intro-text flex-1 ml-8 sm:mr-4 text-white items-center justify-center flex flex-col leading-10 w-full">
             <div className="max-w-xl">

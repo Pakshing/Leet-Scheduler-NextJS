@@ -22,9 +22,9 @@ export default function RootLayout({
     <SessionWrapper>
         <html lang="en">
           <body className={inter.className}>
-            <div className="h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col">
             <Navbar />
-              {children}
+            <div className="flex-grow">{children}</div>
             <Footer />
             </div>
           </body>
