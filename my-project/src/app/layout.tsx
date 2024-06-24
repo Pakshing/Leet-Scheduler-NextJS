@@ -19,16 +19,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SessionWrapper>
+    
         <html lang="en">
           <body className={inter.className}>
+          <SessionWrapper>
             <div className="min-h-screen flex flex-col">
             <Navbar />
             <div className="flex-grow">{children}</div>
             <Footer />
             </div>
+            </SessionWrapper>
           </body>
         </html>
-    </SessionWrapper>
+    
   );
 }

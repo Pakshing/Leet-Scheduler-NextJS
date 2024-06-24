@@ -1,71 +1,177 @@
 'use client'
-import React from "react";
+import React,{useState} from "react";
 import {
   Button,
   Dialog,
   DialogHeader,
   DialogBody,
   DialogFooter,
+  Input,
+  Typography,
+  Checkbox,
+  Card,
+  ButtonGroup,
+  List, 
+  ListItem,
+  ListItemPrefix,
 } from "@material-tailwind/react";
+import { questionTags,daysToReview } from "../../types/type";
+import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
+type UrlFormat = {
+  format:boolean;
+  url:string;
+
+}
+
 const AddQuestionDialog = () => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const { data: session } = useSession();
+  const [checkedTags, setCheckedTags] = useState<Record<string, boolean>>({});
+  const [difficulty, setDifficulty] = useState<string>("");
+  const [daysReview, setDaysReview] = useState<number>();
+  const [inputUrl, setInputUrl] = useState<UrlFormat>({"format":false,"url":""});
  
   const handleOpen = () => setOpen(!open);
+
+
+
+  const handleUrlInput = (e:string) =>{
+    const regrex =  /^https:\/\/leetcode\.com\/problems\/.+$/;
+    if(regrex.test(e)){
+      setInputUrl({"format":true,"url":e})
+    }else{
+      setInputUrl({"format":false,"url":e})
+    } 
+  }
+
+  const handleDfficultyChange = (value:string) => {
+    setDifficulty(value);
+    console.log(value)
+  }
+
+  const handleCheckboxChange = (tag:string) => {
+    setCheckedTags({ ...checkedTags, [tag]: !checkedTags[tag] });
+  };
+
+  const handleDaysReviewChange = (value:number) => {
+    setDaysReview(value);
+    console.log(value)
+  }
+
+  const handleFormSubmit = () => {
+    console.log(inputUrl,difficulty,daysReview,checkedTags)
+    if(inputUrl.format !== true) alert("Please enter a valid URL")
+    else if(difficulty === "") alert("Please select a difficulty")
+    else if(daysReview === undefined) alert("Please select a review date")
+    else if(Object.keys(checkedTags).length === 0) alert("Please select a tag")
+    else{
+      console.log("submit")
+    }
+  }
+
+
+
+
+
  
   return (
     <>
-      {session?.user?(<Link href="/questions"><Button color="white">Start my journey</Button></Link> ):(   
-        <>
-      <Button onClick={handleOpen} color="white" >
-        Login
-      </Button>
-      <Dialog open={open} handler={handleOpen} size="xs">
-        <DialogHeader>Oauth Login</DialogHeader>
+      <Button className="flex items-center gap-3" size="sm" onClick={handleOpen}>
+          <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Question
+        </Button>
+      
+      <Dialog open={open} handler={handleOpen} size="lg">
+        <DialogHeader>Add Question</DialogHeader>
         <DialogBody>
-          <div className="flex flex-col justify-center gap-4">
-              <Button
-                onClick={() => signIn("google")}
-                size="lg"
+        <Card color="transparent" shadow={false}  className="flex items-center justify-center">
+      <form className="mb-2" onSubmit={()=>handleFormSubmit}>
+        <div className="mb-1 flex flex-col gap-6">
+          <Typography variant="h6" color="blue-gray" className="-mb-3">
+            LeetCode URL
+          </Typography>
+          <Input
+            size="lg"
+            placeholder="https://leetcode.com/problems/two-sum/description"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            crossOrigin={""}
+            value={inputUrl.url}
+            onChange={(e) => handleUrlInput(e.target.value)}
+            error={inputUrl.url !== "" && inputUrl.format === false?true:false}
+          />
+          <Typography
+          variant="small"
+          color="gray"
+          className=" flex items-center gap-1 font-normal"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="-mt-px h-4 w-4"
+          >
+            <path
+              fillRule="evenodd"
+              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Please follow this LeetCode Url format: https://leetcode.com/problems/two-sum/***
+      </Typography>
+          <Typography variant="h6" color="blue-gray" className="-mb-3">
+            Difficulty
+          </Typography>
+          <ButtonGroup ripple={true} variant="outlined">
+            <Button onClick={()=>handleDfficultyChange("EASY")} className={difficulty==="EASY"?'bg-black text-white':''}>EASY</Button>
+            <Button onClick={()=>handleDfficultyChange("MEDIUM")} className={difficulty === 'MEDIUM' ? 'bg-black text-white' : ''}>MEDIUM</Button>
+            <Button onClick={()=>handleDfficultyChange("HARD")}className={difficulty === 'HARD' ? 'bg-black text-white' : ''}>HARD</Button>
+          </ButtonGroup>
+          <Typography variant="h6" color="blue-gray" className="-mb-3">
+            Tags
+          </Typography>
+          <div className="flex flex-wrap -m-1">
+            {questionTags.map((tag) => (
+              <Button 
+                key={tag} 
                 variant="outlined"
-                className="h-20 flex items-center justify-center"
+                onClick={() => handleCheckboxChange(tag)} 
+                className={`m-1 py-2 px-3 text-sm ${checkedTags[tag] ? 'bg-black text-white' : 'bg-white text-black'}`}
               >
-             
-              <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="36" height="36" viewBox="0 0 48 48" className="mr-4">
-                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
-                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
-                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
-              </svg>
-              <b className="text-l">Sign in with Google</b>
-            
+                {tag}
               </Button>
-              <Button
-                onClick={() => signIn("github")}
-                size="lg"
-                className="h-20 flex items-center justify-center"
-                variant="outlined"
-              >
-              <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="36" height="36" viewBox="0 0 50 50" className="mr-4">
-                  <path d="M17.791,46.836C18.502,46.53,19,45.823,19,45v-5.4c0-0.197,0.016-0.402,0.041-0.61C19.027,38.994,19.014,38.997,19,39 c0,0-3,0-3.6,0c-1.5,0-2.8-0.6-3.4-1.8c-0.7-1.3-1-3.5-2.8-4.7C8.9,32.3,9.1,32,9.7,32c0.6,0.1,1.9,0.9,2.7,2c0.9,1.1,1.8,2,3.4,2 c2.487,0,3.82-0.125,4.622-0.555C21.356,34.056,22.649,33,24,33v-0.025c-5.668-0.182-9.289-2.066-10.975-4.975 c-3.665,0.042-6.856,0.405-8.677,0.707c-0.058-0.327-0.108-0.656-0.151-0.987c1.797-0.296,4.843-0.647,8.345-0.714 c-0.112-0.276-0.209-0.559-0.291-0.849c-3.511-0.178-6.541-0.039-8.187,0.097c-0.02-0.332-0.047-0.663-0.051-0.999 c1.649-0.135,4.597-0.27,8.018-0.111c-0.079-0.5-0.13-1.011-0.13-1.543c0-1.7,0.6-3.5,1.7-5c-0.5-1.7-1.2-5.3,0.2-6.6 c2.7,0,4.6,1.3,5.5,2.1C21,13.4,22.9,13,25,13s4,0.4,5.6,1.1c0.9-0.8,2.8-2.1,5.5-2.1c1.5,1.4,0.7,5,0.2,6.6c1.1,1.5,1.7,3.2,1.6,5 c0,0.484-0.045,0.951-0.11,1.409c3.499-0.172,6.527-0.034,8.204,0.102c-0.002,0.337-0.033,0.666-0.051,0.999 c-1.671-0.138-4.775-0.28-8.359-0.089c-0.089,0.336-0.197,0.663-0.325,0.98c3.546,0.046,6.665,0.389,8.548,0.689 c-0.043,0.332-0.093,0.661-0.151,0.987c-1.912-0.306-5.171-0.664-8.879-0.682C35.112,30.873,31.557,32.75,26,32.969V33 c2.6,0,5,3.9,5,6.6V45c0,0.823,0.498,1.53,1.209,1.836C41.37,43.804,48,35.164,48,25C48,12.318,37.683,2,25,2S2,12.318,2,25 C2,35.164,8.63,43.804,17.791,46.836z"></path>
-              </svg>
-                <b className="text-l">Sign in with Github</b>
+            ))}
+          </div>
+          <Typography variant="h6" color="blue-gray" className="-mb-3">
+            Next review date
+          </Typography>
+          <ButtonGroup ripple={true} variant="outlined">
+            {daysToReview.map((day) => (
+              <Button key={day} onClick={() => handleDaysReviewChange(day)} className={daysReview === day ? 'bg-black text-white' : ''}>
+                {day} days
               </Button>
-            </div>
+            ))}
+            <Button onClick={() => handleDaysReviewChange(0)} className={daysReview === 0 ? 'bg-black text-white' : ''}>
+              Never
+            </Button>
+          </ButtonGroup>
+        </div>
+      </form>
+    </Card>
         </DialogBody>
         <DialogFooter>
-          <Button variant="gradient" color="green" onClick={handleOpen}>
-            <span>Close</span>
+          <div className="flex gap-4">
+          <Button variant="outlined" onClick={handleOpen} size="sm">
+            <span>Cancel</span>
           </Button>
+          <Button variant="gradient"  onClick={handleFormSubmit} size="sm">
+            <span>Submit</span>
+          </Button>
+          </div>
         </DialogFooter>
       </Dialog>
       </>
-    )}
-    
-    </>
   );
 }
 

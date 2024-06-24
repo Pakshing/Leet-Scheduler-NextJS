@@ -1,6 +1,11 @@
 // pages/api/questions/[id].ts
 
 import { NextResponse, NextRequest } from 'next/server'
+import { NextApiRequest, NextApiResponse } from "next";
+import { getSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth';
+import { getToken } from "next-auth/jwt"
+import { cookies } from 'next/headers'
 import prisma from '../../../../prisma/migrations/client'
 
 type ResponseData = {
@@ -11,7 +16,9 @@ type Question = {
 
 }
    
-export async function GET(){
+export async function GET(req: NextApiRequest, res: NextResponse){
+    const session = await getSession({req})
+    console.log(session)
     const question = await prisma.question.findMany()
     console.log(question)
     return NextResponse.json(question)

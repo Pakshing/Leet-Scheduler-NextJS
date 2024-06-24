@@ -1,6 +1,8 @@
 'use client'
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import AddQuestionDialog from "../dialog/AddQuestionDialog";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { QuestionType } from "../../types/type"; // Add the import statement for the QuestionType type
 import {
   Card,
   CardHeader,
@@ -20,7 +22,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
  
 const TABS = [
   {
@@ -37,69 +39,24 @@ const TABS = [
   },
 ];
  
-const TABLE_HEAD = ["Title", "Difficulty", "Tags", "Next Review", "Last Completion"];
- 
-const TABLE_ROWS = [
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-    name: "John Michael",
-    email: "john@creative-tim.com",
-    job: "Manager",
-    org: "Organization",
-    online: true,
-    date: "23/04/18",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-2.jpg",
-    name: "Alexa Liras",
-    email: "alexa@creative-tim.com",
-    job: "Programator",
-    org: "Developer",
-    online: false,
-    date: "23/04/18",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-1.jpg",
-    name: "Laurent Perrier",
-    email: "laurent@creative-tim.com",
-    job: "Executive",
-    org: "Projects",
-    online: false,
-    date: "19/09/17",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-4.jpg",
-    name: "Michael Levi",
-    email: "michael@creative-tim.com",
-    job: "Programator",
-    org: "Developer",
-    online: true,
-    date: "24/12/08",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-5.jpg",
-    name: "Richard Gran",
-    email: "richard@creative-tim.com",
-    job: "Manager",
-    org: "Executive",
-    online: false,
-    date: "04/10/21",
-  },
-];
+const TABLE_HEAD = ["Title", "Difficulty", "Tags", "Next Review", "Last Completion", "Actions"];
  
 export function QuestionsTable() {
   const [activeTab, setActiveTab] = useState("all");
-  const {data: session} = useSession();
+  const [questions, setQuestions] = useState<QuestionType[]>([]);
+  const { data: session } = useSession();
 
   useEffect(() => {
     // Fetch data from API
     async function fetchData() {
-      console.log("Fetching data...");
-      const response = await fetch(BASE_URL+"/api/questions").then((res) => res.json());
+      const response = await fetch('/api/questions', {
+        method: 'GET',
+        credentials: 'include', // This is important
+    }).then((res) => res.json());
+      setQuestions(response);
     }
     fetchData();
-  }
-  , []);
+  }, []);
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -109,17 +66,14 @@ export function QuestionsTable() {
               Question list
             </Typography>
             <Typography color="gray" className="mt-1 font-normal">
-              Your LeetCode database and scheduler
-              {session?.user?(<Typography color="gray" className="mt-1 font-normal">Welcome back, {session.user?.name}</Typography>):null}
+              {session?.user?(<span color="gray" className="mt-1 font-normal">Your leetcode database & scheduler</span>):null}
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
             <Button variant="outlined" size="sm">
               view all
             </Button>
-            <Button className="flex items-center gap-3" size="sm">
-              <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add member
-            </Button>
+            <AddQuestionDialog/>
           </div>
         </div>
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -136,6 +90,8 @@ export function QuestionsTable() {
             <Input
               label="Search"
               icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+              placeholder="Search question"
+              crossOrigin={""}
             />
           </div>
         </div>
@@ -161,71 +117,62 @@ export function QuestionsTable() {
             </tr>
           </thead>
           <tbody>
-            {TABLE_ROWS.map(
-              ({ img, name, email, job, org, online, date }, index) => {
-                const isLast = index === TABLE_ROWS.length - 1;
+            {questions.map(
+              ({ title,difficulty,tags,reviewDate,lastCompletion }, index) => {
+                const isLast = index === questions.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
  
                 return (
-                  <tr key={name}>
+                  <tr key={title}>
                     <td className={classes}>
-                      <div className="flex items-center gap-3">
-                        <Avatar src={img} alt={name} size="sm" />
-                        <div className="flex flex-col">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal"
-                          >
-                            {name}
-                          </Typography>
+
                           <Typography
                             variant="small"
                             color="blue-gray"
                             className="font-normal opacity-70"
                           >
-                            {email}
+                            {title}
                           </Typography>
-                        </div>
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <div className="flex flex-col">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {job}
-                        </Typography>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal opacity-70"
-                        >
-                          {org}
-                        </Typography>
-                      </div>
                     </td>
                     <td className={classes}>
                       <div className="w-max">
                         <Chip
                           variant="ghost"
                           size="sm"
-                          value={online ? "online" : "offline"}
-                          color={online ? "green" : "blue-gray"}
+                          value={difficulty}
+                          color={getColor(difficulty)}
                         />
-                      </div>
+                        </div>
+                      </td>
+                    <td className={classes}>
+                      <div className="flex gap-2">
+                        {tags.map(tag=>
+                        <Chip
+                        variant="ghost"
+                        size="sm"
+                        value={tag}
+                        color={getTagColors(tag)}
+                      />)}
+                        </div>
                     </td>
                     <td className={classes}>
-                      <Typography
+                    <Typography
                         variant="small"
                         color="blue-gray"
-                        className="font-normal"
+                        className="font-normal opacity-70"
                       >
-                        {date}
+                        {reviewDate?new Date(reviewDate).toDateString():"N/A"}
+                      </Typography>
+                    </td>
+                    <td className={classes}>
+                    <Typography
+                        variant="small"
+                        color="blue-gray"
+                        className="font-normal opacity-70"
+                      >
+                        {new Date(lastCompletion).toDateString()}
                       </Typography>
                     </td>
                     <td className={classes}>
@@ -258,3 +205,39 @@ export function QuestionsTable() {
     </Card>
   );
 }
+
+function getColor(difficult:string){
+  if(difficult==="Easy"){
+    return "green"
+  }else if(difficult==="Medium"){
+    return "blue"
+  }else{
+    return "red"
+  }
+}
+
+function getTagColors(tag: string){
+  tag = tag.toUpperCase();
+
+  if(tag === '') return 'gray';
+  if(tag === 'ARRAY') return 'blue';
+  if(tag === 'STRING') return 'red';
+  if(tag === 'LINKED LIST') return 'green';
+  if(tag === 'RECURSION') return 'amber';
+  if(tag === 'MAP/SET') return 'pink';
+  if(tag === 'BINARY SEARCH') return 'indigo';
+  if(tag === 'HEAP/PRIORITY QUEUE') return 'purple';
+  if(tag === 'SLIDING WINDOW') return 'teal';
+  if(tag === 'STACK/QUEUE') return 'cyan';
+  if(tag === 'TREE') return 'blue';
+  if(tag === 'GRAPH') return 'red';
+  if(tag === 'DYNAMIC PROGRAMMING') return 'green';
+  if(tag === 'GREEDY') return 'amber';
+  if(tag === 'SORTING') return 'pink';
+  if(tag === 'BACKTRACKING') return 'indigo';
+  if(tag === 'INTERVALS') return 'purple';
+  if(tag === 'MATH&GEOMETRY') return 'teal';
+  if(tag === 'BIT MANIPULATION') return 'cyan';
+
+  return 'gray';
+};
