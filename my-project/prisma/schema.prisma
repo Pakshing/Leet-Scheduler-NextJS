@@ -85,18 +85,19 @@ model Authenticator {
 }
 
 model Question {
-  id             Int       @id @default(autoincrement())
-  title          String
-  url            String
-  category       String?
-  difficulty     String
-  dateCreated    DateTime  @default(now())
-  lastCompletion DateTime  @default(now())
-  reviewDate     DateTime?
-  tags           String[]  @default([])
-  lastUpdated    DateTime  @default(now())
-  ownerId        String
-  owner          User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  id              Int       @id @default(autoincrement())
+  title           String
+  url             String
+  category        String?
+  difficulty      String
+  dateCreated     DateTime  @default(now())
+  lastCompletion  DateTime  @default(now())
+  reviewDate      DateTime?
+  tags            String[]  @default([])
+  lastUpdated     DateTime  @default(now())
+  completionCount Int       @default(1)
+  ownerId         String
+  owner           User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@unique([title, ownerId])
 }

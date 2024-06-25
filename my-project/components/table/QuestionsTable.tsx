@@ -19,7 +19,7 @@ import {
   IconButton,
   Tooltip,
 } from "@material-tailwind/react";
-import { useSession } from "next-auth/react";
+import { useSession,getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
@@ -46,13 +46,15 @@ export function QuestionsTable() {
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const { data: session } = useSession();
 
-  useEffect(() => {
+useEffect(() => {
     // Fetch data from API
     async function fetchData() {
-      const response = await fetch('/api/questions', {
+      const session = await getSession();
+      const userId = session?.user?.id;
+      const response = await fetch(`/api/questions?ownerId=${userId}`, {
         method: 'GET',
-        credentials: 'include', // This is important
-    }).then((res) => res.json());
+        credentials: 'include', 
+      }).then((res) => res.json());
       setQuestions(response);
     }
     fetchData();
@@ -79,8 +81,8 @@ export function QuestionsTable() {
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <Tabs value="all" className="w-full md:w-max">
             <TabsHeader>
-              {TABS.map(({ label, value }) => (
-                <Tab key={value} value={value}>
+              {TABS.map(({ label, value, }) => (
+                <Tab key={label} value={value}>
                   &nbsp;&nbsp;{label}&nbsp;&nbsp;
                 </Tab>
               ))}
@@ -118,14 +120,14 @@ export function QuestionsTable() {
           </thead>
           <tbody>
             {questions.map(
-              ({ title,difficulty,tags,reviewDate,lastCompletion }, index) => {
+              ({id, title,difficulty,tags,reviewDate,lastCompletion }, index) => {
                 const isLast = index === questions.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
  
                 return (
-                  <tr key={title}>
+                  <tr key={id}>
                     <td className={classes}>
 
                           <Typography
@@ -150,6 +152,7 @@ export function QuestionsTable() {
                       <div className="flex gap-2">
                         {tags.map(tag=>
                         <Chip
+                        key={index+tag}
                         variant="ghost"
                         size="sm"
                         value={tag}

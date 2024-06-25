@@ -9,6 +9,7 @@ export type QuestionType = {
   reviewDate: Date | null;
   tags: string[];
   lastUpdated: Date;
+  completionCount: number;
   ownerId: string;
 };
 
@@ -33,6 +34,7 @@ export const questionTags: string[] = [
   'MATH&GEOMETRY',
   'BIT MANIPULATION',
   'ALGORITHMN',
+  'DESIGN',
 ]
 
 export const daysToReview: number[] = [1,2,3,5,7,10,14,21,30];

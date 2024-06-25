@@ -61,14 +61,48 @@ const AddQuestionDialog = () => {
     console.log(value)
   }
 
-  const handleFormSubmit = () => {
+  const resetForm = () =>{
+    setInputUrl({"format":false,"url":""})
+    setDifficulty("")
+    setDaysReview(undefined)
+    setCheckedTags({})
+  }
+
+  const handleFormSubmit = async() => {
     console.log(inputUrl,difficulty,daysReview,checkedTags)
+    const tags = Object.keys(checkedTags).filter((tag) => checkedTags[tag]===true);
+    console.log(tags)
     if(inputUrl.format !== true) alert("Please enter a valid URL")
     else if(difficulty === "") alert("Please select a difficulty")
     else if(daysReview === undefined) alert("Please select a review date")
-    else if(Object.keys(checkedTags).length === 0) alert("Please select a tag")
+    else if(tags.length === 0) alert("Please select a tag")
     else{
-      console.log("submit")
+      try {
+        const response = await fetch(`/api/questions`, {
+          method: 'POST',
+          credentials: 'include', 
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            url: inputUrl.url,
+            difficulty: difficulty,
+            daysReview: daysReview,
+            tags: tags,
+            ownerId: session?.user?.id
+          })
+        }).then((res) => res.json());
+        if(response.status === 409){
+          alert("Question already exists")
+          return
+        }
+        if(response.status === 400){
+          throw new Error("An error occured")
+        }
+        resetForm()
+      } catch (error) {
+        alert("An error occured")
+      }
     }
   }
 
