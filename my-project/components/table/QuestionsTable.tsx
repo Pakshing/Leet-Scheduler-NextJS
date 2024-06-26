@@ -19,7 +19,8 @@ import {
   IconButton,
   Tooltip,
 } from "@material-tailwind/react";
-import { useSession,getSession } from "next-auth/react";
+import NextReviewDialog from "../dialog/NextReviewDialog";
+import { useSession, getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
@@ -45,6 +46,7 @@ export function QuestionsTable() {
   const [activeTab, setActiveTab] = useState("all");
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const { data: session } = useSession();
+  const [handleNextReviewDialogOpen, setHandleNextReviewDialogOpen] = useState(false);
 
 useEffect(() => {
     // Fetch data from API
@@ -59,6 +61,11 @@ useEffect(() => {
     }
     fetchData();
   }, []);
+
+  const handleTitileOnlcik = () =>{
+    setHandleNextReviewDialogOpen(!handleNextReviewDialogOpen)
+  }
+
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -120,37 +127,37 @@ useEffect(() => {
           </thead>
           <tbody>
             {questions.map(
-              ({id, title,difficulty,tags,reviewDate,lastCompletion }, index) => {
+              (record, index) => {
                 const isLast = index === questions.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
  
                 return (
-                  <tr key={id}>
+                  <tr key={record.id}>
                     <td className={classes}>
-
                           <Typography
                             variant="small"
                             color="blue-gray"
                             className="font-normal opacity-70"
                           >
-                            {title}
+                            <NextReviewDialog question={record}/>
                           </Typography>
+                           
                     </td>
                     <td className={classes}>
                       <div className="w-max">
                         <Chip
                           variant="ghost"
                           size="sm"
-                          value={difficulty}
-                          color={getColor(difficulty)}
+                          value={record.difficulty}
+                          color={getColor(record.difficulty)}
                         />
                         </div>
                       </td>
                     <td className={classes}>
                       <div className="flex gap-2">
-                        {tags.map(tag=>
+                        {record.tags.map(tag=>
                         <Chip
                         key={index+tag}
                         variant="ghost"
@@ -166,7 +173,11 @@ useEffect(() => {
                         color="blue-gray"
                         className="font-normal opacity-70"
                       >
-                        {reviewDate?new Date(reviewDate).toDateString():"N/A"}
+                        {
+                          record.reviewDate && new Date(record.reviewDate) > new Date() 
+                            ? new Date(record.reviewDate).toDateString() 
+                            : "N/A"
+                        }
                       </Typography>
                     </td>
                     <td className={classes}>
@@ -175,7 +186,7 @@ useEffect(() => {
                         color="blue-gray"
                         className="font-normal opacity-70"
                       >
-                        {new Date(lastCompletion).toDateString()}
+                        {new Date(record.lastCompletion).toDateString()}
                       </Typography>
                     </td>
                     <td className={classes}>

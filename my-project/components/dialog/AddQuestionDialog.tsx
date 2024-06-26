@@ -117,8 +117,8 @@ const AddQuestionDialog = () => {
           <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Question
         </Button>
       
-      <Dialog open={open} handler={handleOpen} size="lg">
-        <DialogHeader>Add Question</DialogHeader>
+      <Dialog open={open} handler={handleOpen} size="lg" className="p-10">
+        
         <DialogBody>
         <Card color="transparent" shadow={false}  className="flex items-center justify-center">
       <form className="mb-2" onSubmit={()=>handleFormSubmit}>

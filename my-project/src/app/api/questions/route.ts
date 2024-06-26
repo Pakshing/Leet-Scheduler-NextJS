@@ -7,12 +7,15 @@ import { getServerSession } from 'next-auth';
 import { getToken } from "next-auth/jwt"
 import { cookies } from 'next/headers'
 import prisma from '../../../../prisma/migrations/client'
+import { daysToReview } from '../../../../types/type';
 
 type ResponseData = {
     message: string
   }
 
 type QuestionInput = {
+    id?: number,
+    title?: string,
     url: string,
     daysReview: number
     difficulty: string,
@@ -59,8 +62,9 @@ export async function POST(request: Request) {
     }
     const duplicate = await prisma.question.findFirst({where: {title: getProblemNameFromUrl(url), ownerId: ownerId}})
     if(duplicate) return NextResponse.json({message: "Question already exists"},{status: 400})    
-    const reviewDate = new Date()
-    reviewDate.setDate(reviewDate.getDate() + daysReview)
+    
+    let reviewDate = new Date()
+    if(daysReview > 0) reviewDate.setDate(reviewDate.getDate() + daysReview)
     const question = {
       "title": getProblemNameFromUrl(url),
       "url": formattedUrl,
@@ -74,6 +78,23 @@ export async function POST(request: Request) {
     return NextResponse.json({message: "Question added", question: result})
   } catch (error) {
     return NextResponse.json({message: "Error adding question", error: error},{status: 400})
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const updatedQuestion: QuestionInput = await request.json();
+    console.log('updatedQuestion\n', updatedQuestion)
+    const nextReviewDate = new Date()
+    nextReviewDate.setDate(nextReviewDate.getDate() + updatedQuestion.daysReview)
+    console.log('nextReviewDate\n', nextReviewDate)
+    const question = await prisma.question.update({where: {id: updatedQuestion.id, ownerId:updatedQuestion.ownerId}, 
+    data: {reviewDate: nextReviewDate, difficulty: updatedQuestion.difficulty, tags: updatedQuestion.tags, ownerId: updatedQuestion.ownerId, lastUpdated: new Date(),lastCompletion: new Date()}})
+    console.log("updated:\n",question)
+    return NextResponse.json({message: "Question updated", question: question})
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json({message: "Error updating question", error: error},{status: 400})
   }
 }
 
