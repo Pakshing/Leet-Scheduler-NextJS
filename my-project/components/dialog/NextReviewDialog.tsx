@@ -23,6 +23,7 @@ import Link from "next/link";
 
 interface NextReviewDialogProps {
     question: QuestionType;
+    refresh : () => void
 }
 
 type QuestionInput = {
@@ -36,7 +37,7 @@ type QuestionInput = {
 }
 
 
-const NextReviewDialog:React.FC<NextReviewDialogProps> = ({question}) => {
+const NextReviewDialog:React.FC<NextReviewDialogProps> = ({question,refresh}) => {
   const [open, setOpen] = useState(false);
   const [daysReview, setDaysReview] = useState<number>();
  
@@ -76,6 +77,7 @@ const NextReviewDialog:React.FC<NextReviewDialogProps> = ({question}) => {
         if(response.status === 400){
           throw new Error("An error occured")
         }
+        refresh()
         resetForm()
         setOpen(false)
       } catch (error) {
@@ -91,10 +93,11 @@ const NextReviewDialog:React.FC<NextReviewDialogProps> = ({question}) => {
  
   return (
     <>
-      <Button variant="text" size="sm" onClick={handleOpen}>
-          <a href={question.url} target="_blank" rel="noopener noreferrer" >{question.title}</a>
-        </Button>
       
+        <a href={question.url} target="_blank" rel="noopener noreferrer" >
+            <Button variant="text" size="sm" onClick={handleOpen}>{question.title} </Button>
+        </a>
+          
       <Dialog open={open} handler={handleOpen} size="lg" className="p-10">
         
         <DialogBody>

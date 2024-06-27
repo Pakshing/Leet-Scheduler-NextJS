@@ -50,17 +50,24 @@ export function QuestionsTable() {
 
 useEffect(() => {
     // Fetch data from API
-    async function fetchData() {
-      const session = await getSession();
-      const userId = session?.user?.id;
-      const response = await fetch(`/api/questions?ownerId=${userId}`, {
-        method: 'GET',
-        credentials: 'include', 
-      }).then((res) => res.json());
-      setQuestions(response);
-    }
-    fetchData();
+    // async function fetchData() {
+    //   fetchQuestionsByOwner()
+    // }
+    fetchQuestionsByOwner()
+    //fetchData();
   }, []);
+
+  async function fetchQuestionsByOwner() {
+    const session = await getSession();
+    const userId = session?.user?.id;
+    const response = await fetch(`/api/questions?ownerId=${userId}`, {
+      method: 'GET',
+      credentials: 'include', 
+    });
+    const data = await response.json();
+    setQuestions(data);
+
+  }
 
   const handleTitileOnlcik = () =>{
     setHandleNextReviewDialogOpen(!handleNextReviewDialogOpen)
@@ -141,7 +148,7 @@ useEffect(() => {
                             color="blue-gray"
                             className="font-normal opacity-70"
                           >
-                            <NextReviewDialog question={record}/>
+                            <NextReviewDialog question={record} refresh={fetchQuestionsByOwner}/>
                           </Typography>
                            
                     </td>
@@ -221,9 +228,9 @@ useEffect(() => {
 }
 
 function getColor(difficult:string){
-  if(difficult==="Easy"){
+  if(difficult.toUpperCase()==="EASY"){
     return "green"
-  }else if(difficult==="Medium"){
+  }else if(difficult.toUpperCase()==="MEDIUM"){
     return "blue"
   }else{
     return "red"
