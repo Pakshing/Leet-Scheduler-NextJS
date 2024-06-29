@@ -7,10 +7,12 @@ import {
   DialogBody,
   DialogFooter,
 } from "@material-tailwind/react";
+import { useRouter } from 'next/navigation'
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 const OauthLoginDialog = () => {
+  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const { data: session } = useSession();
  
@@ -28,7 +30,7 @@ const OauthLoginDialog = () => {
         <DialogBody>
           <div className="flex flex-col justify-center gap-4">
               <Button
-                onClick={() => signIn("google")}
+                onClick={() => signIn("google", {callbackUrl: '/questions'})}
                 size="lg"
                 variant="outlined"
                 className="h-20 flex items-center justify-center"
@@ -44,7 +46,7 @@ const OauthLoginDialog = () => {
             
               </Button>
               <Button
-                onClick={() => signIn("github")}
+                onClick={() => signIn('github', { callbackUrl: '/questions' })}
                 size="lg"
                 className="h-20 flex items-center justify-center"
                 variant="outlined"

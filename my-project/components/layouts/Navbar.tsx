@@ -1,5 +1,6 @@
 'use client'
 import React,{useState} from 'react'
+import { useRouter } from 'next/navigation'
 import { ClockCircleOutlined } from '@ant-design/icons';
 import OauthLoginDialog from '../dialog/OauthLoginDialog';
 import { useSession, signOut} from 'next-auth/react';
@@ -7,6 +8,7 @@ import { Button } from "@material-tailwind/react";
 import Link from 'next/link';
 
 const Navbar = () => {
+    const router = useRouter();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const {data: session} = useSession();
 
@@ -34,7 +36,19 @@ const Navbar = () => {
         </div>
         {/* Secondary Div */}
         <div className="hidden md:flex items-center space-x-1">
-            {session ? (<Button color="white" size='sm' onClick={() => signOut()}>Logout</Button>):(<OauthLoginDialog/>)}
+        {session ? (
+          <Button 
+            color="white" 
+            size='sm' 
+            onClick={() => {
+              signOut()
+            }}
+          >
+            Logout
+          </Button>
+        ):(
+          <OauthLoginDialog/>
+        )}
         </div>
         {/* Mobile Button */}
         <div className="md:hidden flex items-center">

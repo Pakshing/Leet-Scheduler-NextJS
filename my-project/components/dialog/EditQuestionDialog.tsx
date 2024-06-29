@@ -1,5 +1,5 @@
 'use client'
-import React,{useState} from "react";
+import React,{useEffect, useState} from "react";
 import {
   Button,
   Dialog,
@@ -15,7 +15,7 @@ import {
   ListItem,
   ListItemPrefix,
 } from "@material-tailwind/react";
-import { questionTags,daysToReview } from "../../types/type";
+import { questionTags,daysToReview, QuestionType } from "../../types/type";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -23,14 +23,15 @@ import Link from "next/link";
 type UrlFormat = {
   format:boolean;
   url:string;
-
 }
 
-interface AddQuestionDialogProps {
-  refresh: () => void;
+interface EditQuestionDialogProps {
+    question: QuestionType;
+    refresh: () => void;
 }
 
-const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
+
+const EditQuestionDialog:React.FC<EditQuestionDialogProps> = ({question,refresh}) => {
   const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const [checkedTags, setCheckedTags] = useState<string[]>([]);
@@ -40,7 +41,13 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
  
   const handleOpen = () => setOpen(!open);
 
-
+    useEffect(() => {
+    setCheckedTags(question.tags)
+    setDifficulty(question.difficulty)
+    setInputUrl({"format":true,"url":question.url})
+    setDaysReview(undefined)
+    }
+    , [question])
 
   const handleUrlInput = (e:string) =>{
     const regrex =  /^https:\/\/leetcode\.com\/problems\/.+$/;
@@ -72,46 +79,47 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
     setCheckedTags([])
   }
 
-  const handleCancelOnClick = () => {
-    resetForm()
-    setOpen(false)
-  } 
-
   const handleFormSubmit = async() => {
-    console.log(inputUrl,difficulty,daysReview,checkedTags)
     if(inputUrl.format !== true) alert("Please enter a valid URL")
     else if(difficulty === "") alert("Please select a difficulty")
     else if(daysReview === undefined) alert("Please select a review date")
     else if(checkedTags.length === 0) alert("Please select a tag")
     else{
       try {
+        console.log({
+            id: question.id,
+            title: question.title,
+            url: inputUrl.url,
+            daysReview: daysReview,
+            difficulty: difficulty,
+            tags: checkedTags,
+            ownerId: question.ownerId,
+            hasCompleted:false
+        })
         const response = await fetch(`/api/questions`, {
-          method: 'POST',
+          method: 'PUT',
           credentials: 'include', 
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            id: question.id,
+            title: question.title,
             url: inputUrl.url,
-            difficulty: difficulty,
             daysReview: daysReview,
+            difficulty: difficulty,
             tags: checkedTags,
-            ownerId: session?.user?.id
-          })
-        });
-        console.log(response.status)
-        if(response.status === 409){
-          alert("Question already exists")
-          return
-        }
+            ownerId: question.ownerId,
+            hasCompleted:false
+        })
+        }).then((res) => res.json());
         if(response.status === 400){
-          alert("An error occured")
+          alert("An error occured")  
           throw new Error("An error occured")
         }
         refresh()
         resetForm()
         setOpen(false)
-
       } catch (error) {
         alert("An error occured")
       }
@@ -126,7 +134,7 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
   return (
     <>
       <Button className="flex items-center gap-3" size="sm" onClick={handleOpen}>
-          <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Question
+          Edit
         </Button>
       
       <Dialog open={open} handler={handleOpen} size="lg" className="p-10">
@@ -208,7 +216,7 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
         </DialogBody>
         <DialogFooter>
           <div className="flex gap-4">
-          <Button variant="outlined" onClick={handleCancelOnClick} size="sm">
+          <Button variant="outlined" onClick={handleOpen} size="sm">
             <span>Cancel</span>
           </Button>
           <Button variant="gradient"  onClick={handleFormSubmit} size="sm">
@@ -221,4 +229,4 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
   );
 }
 
-export default AddQuestionDialog;
+export default EditQuestionDialog;

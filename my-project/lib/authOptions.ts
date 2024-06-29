@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient();
 
+
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     providers: [
@@ -23,5 +24,12 @@ export const authOptions: NextAuthOptions = {
             session.user.id = user.id;
             return session;
         }
+    },
+    pages: {
+        signIn: '/auth/signin',
+        signOut: '/auth/signout',
+        error: '/auth/error',
+        verifyRequest: '/auth/verify-request',
+        newUser: '/questions'  // Redirect new users to the questions page
     }
 };

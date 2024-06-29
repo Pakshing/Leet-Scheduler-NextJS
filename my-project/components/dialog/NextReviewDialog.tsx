@@ -64,7 +64,8 @@ const NextReviewDialog:React.FC<NextReviewDialogProps> = ({question,refresh}) =>
             daysReview: daysReview,
             difficulty: question.difficulty,
             tags: question.tags,
-            ownerId: question.ownerId
+            ownerId: question.ownerId,
+            hasCompleted:true
         }
         const response = await fetch(`/api/questions`, {
           method: 'PUT',

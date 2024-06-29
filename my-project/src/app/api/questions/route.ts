@@ -1,13 +1,7 @@
 // pages/api/questions/[id].ts
 
 import { NextResponse, NextRequest } from 'next/server'
-import { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from 'next-auth/react'
-import { getServerSession } from 'next-auth';
-import { getToken } from "next-auth/jwt"
-import { cookies } from 'next/headers'
 import prisma from '../../../../prisma/migrations/client'
-import { daysToReview } from '../../../../types/type';
 
 type ResponseData = {
     message: string
@@ -21,6 +15,7 @@ type QuestionInput = {
     difficulty: string,
     tags: string[],
     ownerId: string
+    hasCompleted?: boolean
 }
 
 type QuestionType = {
@@ -61,7 +56,8 @@ export async function POST(request: Request) {
       formattedUrl = url
     }
     const duplicate = await prisma.question.findFirst({where: {title: getProblemNameFromUrl(url), ownerId: ownerId}})
-    if(duplicate) return NextResponse.json({message: "Question already exists"},{status: 400})    
+    console.log(duplicate)
+    if(duplicate) return NextResponse.json({message: "Question already exists"},{status: 409})    
     
     let reviewDate = new Date()
     if(daysReview > 0) reviewDate.setDate(reviewDate.getDate() + daysReview)
@@ -85,11 +81,14 @@ export async function PUT(request: Request) {
   try {
     const updatedQuestion: QuestionInput = await request.json();
     console.log('updatedQuestion\n', updatedQuestion)
+
     const nextReviewDate = new Date()
     nextReviewDate.setDate(nextReviewDate.getDate() + updatedQuestion.daysReview)
     console.log('nextReviewDate\n', nextReviewDate)
     const question = await prisma.question.update({where: {id: updatedQuestion.id, ownerId:updatedQuestion.ownerId}, 
-    data: {reviewDate: nextReviewDate, difficulty: updatedQuestion.difficulty, tags: updatedQuestion.tags, ownerId: updatedQuestion.ownerId, lastUpdated: new Date(),lastCompletion: new Date()}})
+    data: { completionCount: {
+      increment: updatedQuestion.hasCompleted?1:0
+    },title:getProblemNameFromUrl(updatedQuestion.url), reviewDate: nextReviewDate, difficulty: updatedQuestion.difficulty, tags: updatedQuestion.tags, ownerId: updatedQuestion.ownerId, lastUpdated: new Date(),lastCompletion: new Date()}})
     console.log("updated:\n",question)
     return NextResponse.json({message: "Question updated", question: question})
   } catch (error) {

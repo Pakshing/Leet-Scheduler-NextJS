@@ -1,6 +1,8 @@
 'use client'
+import { useRouter } from 'next/navigation'
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import AddQuestionDialog from "../dialog/AddQuestionDialog";
+import EditQuestionDialog from "../dialog/EditQuestionDialog";
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import { QuestionType } from "../../types/type"; // Add the import statement for the QuestionType type
 import {
@@ -43,23 +45,20 @@ const TABS = [
 const TABLE_HEAD = ["Title", "Difficulty", "Tags", "Next Review", "Last Completion", "Actions"];
  
 export function QuestionsTable() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const { data: session } = useSession();
   const [handleNextReviewDialogOpen, setHandleNextReviewDialogOpen] = useState(false);
 
 useEffect(() => {
-    // Fetch data from API
-    // async function fetchData() {
-    //   fetchQuestionsByOwner()
-    // }
     fetchQuestionsByOwner()
-    //fetchData();
   }, []);
 
   async function fetchQuestionsByOwner() {
     const session = await getSession();
     const userId = session?.user?.id;
+    if(!userId) router.push('/');
     const response = await fetch(`/api/questions?ownerId=${userId}`, {
       method: 'GET',
       credentials: 'include', 
@@ -69,8 +68,20 @@ useEffect(() => {
 
   }
 
-  const handleTitileOnlcik = () =>{
-    setHandleNextReviewDialogOpen(!handleNextReviewDialogOpen)
+  const handDeleteOnClick = async(questionId:number,ownerId:string) =>{
+    const userResponse = window.confirm("Are you sure you want to delete this question?");
+    if (userResponse && ownerId) {
+      try {
+        const response = await fetch(`${BASE_URL}/api/questions/${questionId}?ownerId=${ownerId}`, {
+          method: 'DELETE',
+          credentials: 'include', 
+        });
+        if(response.status !== 200) alert("An error occurred while deleting the question")
+        else fetchQuestionsByOwner()
+      } catch (error) {
+        alert("An error occurred while deleting the question")
+      }
+    }
   }
 
   return (
@@ -89,7 +100,7 @@ useEffect(() => {
             <Button variant="outlined" size="sm">
               view all
             </Button>
-            <AddQuestionDialog/>
+            <AddQuestionDialog refresh={fetchQuestionsByOwner}/>
           </div>
         </div>
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -197,11 +208,16 @@ useEffect(() => {
                       </Typography>
                     </td>
                     <td className={classes}>
-                      <Tooltip content="Edit User">
-                        <IconButton variant="text">
-                          <PencilIcon className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
+                      <div className="flex gap-4">
+                        <Tooltip content="Edit Question">
+                            <EditQuestionDialog question={record} refresh={fetchQuestionsByOwner}/>
+                        </Tooltip>
+                        <Tooltip content="Delete Question">
+                          <Button className="flex items-center gap-3" size="sm" color="red" variant="outlined" onClick={()=>handDeleteOnClick(record.id,record.ownerId)}>
+                            Delete
+                          </Button>
+                        </Tooltip>
+                      </div>
                     </td>
                   </tr>
                 );
