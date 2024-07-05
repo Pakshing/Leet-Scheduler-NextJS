@@ -16,9 +16,6 @@ import {
   ListItemPrefix,
 } from "@material-tailwind/react";
 import { questionTags,daysToReview, QuestionType } from "../../types/type";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import { signIn, signOut, useSession } from "next-auth/react";
-import Link from "next/link";
 
 type UrlFormat = {
   format:boolean;
@@ -33,7 +30,6 @@ interface EditQuestionDialogProps {
 
 const EditQuestionDialog:React.FC<EditQuestionDialogProps> = ({question,refresh}) => {
   const [open, setOpen] = useState(false);
-  const { data: session } = useSession();
   const [checkedTags, setCheckedTags] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState<string>("");
   const [daysReview, setDaysReview] = useState<number>();
@@ -86,16 +82,6 @@ const EditQuestionDialog:React.FC<EditQuestionDialogProps> = ({question,refresh}
     else if(checkedTags.length === 0) alert("Please select a tag")
     else{
       try {
-        console.log({
-            id: question.id,
-            title: question.title,
-            url: inputUrl.url,
-            daysReview: daysReview,
-            difficulty: difficulty,
-            tags: checkedTags,
-            ownerId: question.ownerId,
-            hasCompleted:false
-        })
         const response = await fetch(`/api/questions`, {
           method: 'PUT',
           credentials: 'include', 
@@ -141,7 +127,7 @@ const EditQuestionDialog:React.FC<EditQuestionDialogProps> = ({question,refresh}
         
         <DialogBody>
         <Card color="transparent" shadow={false}  className="flex items-center justify-center">
-      <form className="mb-2" onSubmit={()=>handleFormSubmit}>
+      <form className="mb-2" onSubmit={handleFormSubmit}>
         <div className="mb-1 flex flex-col gap-6">
           <Typography variant="h6" color="blue-gray" className="-mb-3">
             LeetCode URL

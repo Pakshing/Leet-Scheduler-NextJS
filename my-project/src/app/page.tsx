@@ -1,9 +1,4 @@
-import { useState } from "react";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
-
-
-import logo from "../../public/logo.png";
 import OauthLoginDialog from "../../components/dialog/OauthLoginDialog";
 
 export default function Home() {
@@ -20,7 +15,7 @@ export default function Home() {
             </div>
           </div>
           <div className="hidden lg:flex flex-1 items-center mr-10 rounded-lg ">
-            <Image  src="/homeQuestions.png" alt="Questions" layout="responsive" width={100} height={100}  />
+            <Image  src="/homeQuestions.png" alt="Questions"  width={1000} height={1000}  />
           </div>
         </div>
     </div>

@@ -1,5 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import {ChangeEvent} from 'react'
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import AddQuestionDialog from "../dialog/AddQuestionDialog";
 import EditQuestionDialog from "../dialog/EditQuestionDialog";
@@ -46,17 +47,15 @@ const TABLE_HEAD = ["Title", "Difficulty", "Tags", "Next Review", "Last Completi
  
 export function QuestionsTable() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("all");
   const [questions, setQuestions] = useState<QuestionType[]>([]);
-  const { data: session } = useSession();
-  const [handleNextReviewDialogOpen, setHandleNextReviewDialogOpen] = useState(false);
+  const [activeTabQuestions, setActiveTabQuestions] = useState<QuestionType[]>([])
+  const { data: session, status } = useSession();
 
 useEffect(() => {
-    fetchQuestionsByOwner()
-  }, []);
+  if(status === "authenticated") fetchQuestionsByOwner()
+  }, [status]);
 
   async function fetchQuestionsByOwner() {
-    const session = await getSession();
     const userId = session?.user?.id;
     if(!userId) router.push('/');
     const response = await fetch(`/api/questions?ownerId=${userId}`, {
@@ -65,6 +64,7 @@ useEffect(() => {
     });
     const data = await response.json();
     setQuestions(data);
+    setActiveTabQuestions(data)
 
   }
 
@@ -84,6 +84,46 @@ useEffect(() => {
     }
   }
 
+
+  const handleActiveTab = (tab:string) =>{
+    const today = new Date().setHours(0,0,0,0)
+    if(tab === "DUE"){
+      const newFilteredQuestions = questions.filter(question=>{
+        console.log(question.reviewDate)
+        if(question.reviewDate === null) return false;
+        let date = new Date(question.reviewDate).setHours(0,0,0,0)
+        return date <= today
+        
+      })
+      setActiveTabQuestions(newFilteredQuestions)
+    }
+    if(tab === "ALL"){
+      setActiveTabQuestions(questions)
+    }
+    if(tab === "FUTURE"){
+      const newFilteredQuestions = questions.filter(question=>{
+        if(question.reviewDate === null) return false;
+        let date = new Date(question.reviewDate).setHours(0,0,0,0)
+        return date > today
+        
+      })
+      setActiveTabQuestions(newFilteredQuestions)
+    }
+  }
+
+  const handleSearchInput = (event:ChangeEvent<HTMLInputElement>) =>{
+    const query = event.target.value
+    if(query === "") setActiveTabQuestions(questions)
+    else{
+      const filtered = questions.filter((question) =>
+        question.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setActiveTabQuestions(filtered)
+    }    
+  }
+
+  
+
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -97,9 +137,6 @@ useEffect(() => {
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <Button variant="outlined" size="sm">
-              view all
-            </Button>
             <AddQuestionDialog refresh={fetchQuestionsByOwner}/>
           </div>
         </div>
@@ -107,7 +144,7 @@ useEffect(() => {
           <Tabs value="all" className="w-full md:w-max">
             <TabsHeader>
               {TABS.map(({ label, value, }) => (
-                <Tab key={label} value={value}>
+                <Tab key={label} value={value} onClick={()=>handleActiveTab(value.toUpperCase())}>
                   &nbsp;&nbsp;{label}&nbsp;&nbsp;
                 </Tab>
               ))}
@@ -117,8 +154,9 @@ useEffect(() => {
             <Input
               label="Search"
               icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              placeholder="Search question"
+              placeholder="Two Sum"
               crossOrigin={""}
+              onChange={handleSearchInput}
             />
           </div>
         </div>
@@ -144,7 +182,7 @@ useEffect(() => {
             </tr>
           </thead>
           <tbody>
-            {questions.map(
+            {activeTabQuestions.map(
               (record, index) => {
                 const isLast = index === questions.length - 1;
                 const classes = isLast
@@ -194,7 +232,7 @@ useEffect(() => {
                         {
                           record.reviewDate && new Date(record.reviewDate) > new Date() 
                             ? new Date(record.reviewDate).toDateString() 
-                            : "N/A"
+                            : "Never"
                         }
                       </Typography>
                     </td>
@@ -209,14 +247,10 @@ useEffect(() => {
                     </td>
                     <td className={classes}>
                       <div className="flex gap-4">
-                        <Tooltip content="Edit Question">
-                            <EditQuestionDialog question={record} refresh={fetchQuestionsByOwner}/>
-                        </Tooltip>
-                        <Tooltip content="Delete Question">
+                          <EditQuestionDialog question={record} refresh={fetchQuestionsByOwner}/>
                           <Button className="flex items-center gap-3" size="sm" color="red" variant="outlined" onClick={()=>handDeleteOnClick(record.id,record.ownerId)}>
                             Delete
                           </Button>
-                        </Tooltip>
                       </div>
                     </td>
                   </tr>

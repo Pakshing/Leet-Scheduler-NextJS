@@ -14,13 +14,13 @@ import Link from "next/link";
 const OauthLoginDialog = () => {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
  
   const handleOpen = () => setOpen(!open);
  
   return (
     <>
-      {session?.user?(<Link href="/questions"><Button color="white">Start my journey</Button></Link> ):(   
+      {status === "authenticated" ? (<Link href="/questions"><Button color="white">Start my journey</Button></Link> ):(   
         <>
       <Button onClick={handleOpen} color="white" >
         Login

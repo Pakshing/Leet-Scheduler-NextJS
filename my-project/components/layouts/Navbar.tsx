@@ -10,7 +10,7 @@ import Link from 'next/link';
 const Navbar = () => {
     const router = useRouter();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const {data: session} = useSession();
+    const {data: session, status} = useSession();
 
     const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -30,13 +30,12 @@ const Navbar = () => {
           </div>
           {/* Primary Div */}
           <div className="hidden md:flex items-center space-x-5 pr-3 ">
-            <Link href="about"><span className="hover:text-gray-400 text-md">About</span></Link>
-            <Link href="questions"><span className="hover:text-gray-400 text-md">Questions</span></Link>           
+            {status === "authenticated" && <Link href="questions"><span className="hover:text-gray-400 text-md">Questions</span></Link> }
           </div>
         </div>
         {/* Secondary Div */}
         <div className="hidden md:flex items-center space-x-1">
-        {session ? (
+        {status === "authenticated" ? (
           <Button 
             color="white" 
             size='sm' 
