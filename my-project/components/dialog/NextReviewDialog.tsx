@@ -96,7 +96,7 @@ const NextReviewDialog:React.FC<NextReviewDialogProps> = ({question,refresh}) =>
     <>
       
         <a href={question.url} target="_blank" rel="noopener noreferrer" >
-            <Button variant="text" size="sm" onClick={handleOpen}>{question.title} </Button>
+            <Button className="px-2" variant="text" size="sm" onClick={handleOpen}>{question.title} </Button>
         </a>
           
       <Dialog open={open} handler={handleOpen} size="lg" className="p-10">

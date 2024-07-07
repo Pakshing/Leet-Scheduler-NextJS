@@ -18,9 +18,6 @@ import {
   Tabs,
   TabsHeader,
   Tab,
-  Avatar,
-  IconButton,
-  Tooltip,
 } from "@material-tailwind/react";
 import NextReviewDialog from "../dialog/NextReviewDialog";
 import { useSession, getSession } from "next-auth/react";
@@ -136,20 +133,7 @@ useEffect(() => {
               {session?.user?(<span color="gray" className="mt-1 font-normal">Your leetcode database & scheduler</span>):null}
             </Typography>
           </div>
-          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-            <AddQuestionDialog refresh={fetchQuestionsByOwner}/>
-          </div>
-        </div>
-        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <Tabs value="all" className="w-full md:w-max">
-            <TabsHeader>
-              {TABS.map(({ label, value, }) => (
-                <Tab key={label} value={value} onClick={()=>handleActiveTab(value.toUpperCase())}>
-                  &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                </Tab>
-              ))}
-            </TabsHeader>
-          </Tabs>
+          <div className="flex shrink-0 flex-col gap-2 lg:flex-row">
           <div className="w-full md:w-72">
             <Input
               label="Search"
@@ -159,23 +143,34 @@ useEffect(() => {
               onChange={handleSearchInput}
             />
           </div>
+          <Tabs value="all" className="w-full md:w-max">
+            <TabsHeader>
+              {TABS.map(({ label, value, }) => (
+                <Tab key={label} value={value} onClick={()=>handleActiveTab(value.toUpperCase())}>
+                  &nbsp;&nbsp;{label}&nbsp;&nbsp;
+                </Tab>
+              ))}
+            </TabsHeader>
+          </Tabs>
+            <AddQuestionDialog refresh={fetchQuestionsByOwner}/>
+          </div>
         </div>
       </CardHeader>
-      <CardBody className="overflow-scroll px-0">
-        <table className="mt-4 w-full min-w-max table-auto text-left">
+      <CardBody className="overflow-scroll px-0 py-0">
+        <table className="w-full min-w-max table-auto text-left">
           <thead>
             <tr>
               {TABLE_HEAD.map((head) => (
                 <th
                   key={head}
-                  className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4"
+                  className="border-y bg-black p-4 sticky top-0 z-10"
                 >
                   <Typography
                     variant="small"
-                    color="blue-gray"
-                    className="font-normal leading-none opacity-70"
+                    color="white"
+                    className="font-normal leading-none "
                   >
-                    {head}
+                    <b className={head === "Title" ? 'px-2':''}>{head}</b>
                   </Typography>
                 </th>
               ))}
@@ -195,7 +190,7 @@ useEffect(() => {
                           <Typography
                             variant="small"
                             color="blue-gray"
-                            className="font-normal opacity-70"
+                            className="font-normal "
                           >
                             <NextReviewDialog question={record} refresh={fetchQuestionsByOwner}/>
                           </Typography>
@@ -227,22 +222,26 @@ useEffect(() => {
                     <Typography
                         variant="small"
                         color="blue-gray"
-                        className="font-normal opacity-70"
+                        className="font-normal"
                       >
+                        <b>
                         {
                           record.reviewDate && new Date(record.reviewDate) > new Date() 
                             ? new Date(record.reviewDate).toDateString() 
                             : "Never"
                         }
+                        </b>
                       </Typography>
                     </td>
                     <td className={classes}>
                     <Typography
                         variant="small"
                         color="blue-gray"
-                        className="font-normal opacity-70"
+                        className="font-normal"
                       >
+                        <b>
                         {new Date(record.lastCompletion).toDateString()}
+                        </b>
                       </Typography>
                     </td>
                     <td className={classes}>
@@ -260,7 +259,7 @@ useEffect(() => {
           </tbody>
         </table>
       </CardBody>
-      <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+      {/* <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
         <Typography variant="small" color="blue-gray" className="font-normal">
           Page 1 of 10
         </Typography>
@@ -272,7 +271,7 @@ useEffect(() => {
             Next
           </Button>
         </div>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   );
 }
