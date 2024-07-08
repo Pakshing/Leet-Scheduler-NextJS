@@ -35,6 +35,6 @@ export const authOptions: NextAuthOptions = {
         signOut: '/auth/signout',
         error: '/auth/error',
         verifyRequest: '/auth/verify-request',
-        newUser: '/'  // Redirect new users to the questions page
+        newUser: '/questions'  // Redirect new users to the questions page
     }
 };
