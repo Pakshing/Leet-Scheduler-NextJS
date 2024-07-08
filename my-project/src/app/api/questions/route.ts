@@ -33,6 +33,7 @@ type QuestionType = {
     ownerId: string;
   };
 
+     
    
 export async function GET(req: Request, res: NextResponse){
     const {searchParams} = new URL(req.url)
