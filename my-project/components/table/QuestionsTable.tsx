@@ -1,11 +1,13 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import {ChangeEvent} from 'react'
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import AddQuestionDialog from "../dialog/AddQuestionDialog";
 import EditQuestionDialog from "../dialog/EditQuestionDialog";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
-import { QuestionType } from "../../types/type"; // Add the import statement for the QuestionType type
+import {
+  MagnifyingGlassIcon,
+  ChevronUpDownIcon,
+} from "@heroicons/react/24/outline";
+import {TABLE_HEAD, QuestionType, ColumnSortingType, initialSortingState, convertColumnTypeToQuestionType } from "../../types/type"; // Add the import statement for the QuestionType type
 import {
   Card,
   CardHeader,
@@ -40,16 +42,20 @@ const TABS = [
   },
 ];
  
-const TABLE_HEAD = ["Title", "Difficulty", "Tags", "Next Review", "Last Completion", "Actions"];
- 
+
+
 export function QuestionsTable() {
   const router = useRouter();
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [activeTabQuestions, setActiveTabQuestions] = useState<QuestionType[]>([])
+  const [columnSorting, setColumnSorting] = useState<ColumnSortingType>(initialSortingState)
   const { data: session, status } = useSession();
 
 useEffect(() => {
   if(status === "authenticated") fetchQuestionsByOwner()
+  if(status === "unauthenticated"){
+    router.push('/')
+  }
   }, [status]);
 
   async function fetchQuestionsByOwner() {
@@ -119,6 +125,61 @@ useEffect(() => {
     }    
   }
 
+  const sorting = (name:keyof ColumnSortingType) =>{
+    console.log(columnSorting)
+    setColumnSorting((prevState) => ({
+      ...prevState,
+      [name]: ((prevState[name] + 1)%3),
+    }));
+    sortByColumn(name, (columnSorting[name] + 1) % 3);
+  }
+
+  const sortByColumn = (name: keyof ColumnSortingType, type: number) => {
+    const typedName = convertColumnTypeToQuestionType(name)
+    let sortedArray = [...questions];
+    if(sortedArray.length === 0) return
+    if (type === 1) {
+      sortedArray.sort((a, b) => {
+        const aValue = a[typedName];
+        const bValue = b[typedName];
+        if (aValue === null || aValue === undefined) return -1;
+        if (bValue === null || bValue === undefined) return 1;
+        return aValue > bValue ? 1 : -1;
+      });
+    } else if (type === 2) {
+      sortedArray.sort((a, b) => {
+        const aValue = a[typedName];
+        const bValue = b[typedName];
+        if (aValue === null || aValue === undefined) return 1;
+        if (bValue === null || bValue === undefined) return -1;
+        return aValue < bValue ? 1 : -1;
+      });
+    } else {
+      sortedArray = questions;
+    }
+    setActiveTabQuestions(sortedArray)
+  };
+
+  const sortByTitle = (type:number) =>{
+    
+  }
+
+  const sortByDifficuly = () =>{
+    
+  }
+
+  const sortByTags = () =>{
+    
+  }
+
+  const sortByNextReview = () =>{
+
+  }
+
+  const sortByLastCompletion = () =>{
+
+  }
+
   
 
   return (
@@ -160,19 +221,27 @@ useEffect(() => {
         <table className="w-full min-w-max table-auto text-left">
           <thead>
             <tr>
-              {TABLE_HEAD.map((head) => (
+              {TABLE_HEAD.map((head,index) => (
+                
                 <th
                   key={head}
                   className="border-y bg-black p-4 sticky top-0 z-10"
+                  
                 >
+                  <button onClick={()=>sorting(head)}>
                   <Typography
                     variant="small"
                     color="white"
-                    className="font-normal leading-none "
+                    className="font-normal leading-none flex items-center"
                   >
-                    <b className={head === "Title" ? 'px-2':''}>{head}</b>
+                    <b className={head.toLowerCase() === "title" ? 'pl-2':''}>{head}</b>
+                    {index !== TABLE_HEAD.length - 1 && (
+                      <ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
+                    )}
                   </Typography>
+                  </button>
                 </th>
+                
               ))}
             </tr>
           </thead>
@@ -180,23 +249,23 @@ useEffect(() => {
             {activeTabQuestions.map(
               (record, index) => {
                 const isLast = index === questions.length - 1;
-                const classes = isLast
+                const classes = isLast 
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
  
                 return (
                   <tr key={record.id}>
-                    <td className={classes}>
+                    <td className= {columnSorting["Title"] === 0? "p-4 border-b border-blue-gray-100" : "p-4 border-b border-blue-gray-200 bg-gray-200"} >
                           <Typography
                             variant="small"
                             color="blue-gray"
-                            className="font-normal "
+                            className="font-normal"
                           >
                             <NextReviewDialog question={record} refresh={fetchQuestionsByOwner}/>
                           </Typography>
                            
                     </td>
-                    <td className={classes}>
+                    <td className={columnSorting["Difficulty"] === 0? "p-4 border-b border-blue-gray-100" : "p-4 border-b border-blue-gray-200 bg-gray-200"} >
                       <div className="w-max">
                         <Chip
                           variant="ghost"
@@ -206,7 +275,7 @@ useEffect(() => {
                         />
                         </div>
                       </td>
-                    <td className={classes}>
+                    <td className={columnSorting["Tags"] === 0? "p-4 border-b border-blue-gray-100" : "p-4 border-b border-blue-gray-200 bg-gray-200"}>
                       <div className="flex gap-2">
                         {record.tags.map(tag=>
                         <Chip
@@ -218,7 +287,7 @@ useEffect(() => {
                       />)}
                         </div>
                     </td>
-                    <td className={classes}>
+                    <td className={columnSorting["Next_Review"] === 0? "p-4 border-b border-blue-gray-100" : "p-4 border-b border-blue-gray-200 bg-gray-200"} >
                     <Typography
                         variant="small"
                         color="blue-gray"
@@ -233,7 +302,7 @@ useEffect(() => {
                         </b>
                       </Typography>
                     </td>
-                    <td className={classes}>
+                    <td className={columnSorting["Last_Completion"] === 0? "p-4 border-b border-blue-gray-100" : "p-4 border-b border-blue-gray-200 bg-gray-200"}>
                     <Typography
                         variant="small"
                         color="blue-gray"
@@ -244,7 +313,7 @@ useEffect(() => {
                         </b>
                       </Typography>
                     </td>
-                    <td className={classes}>
+                    <td className="p-4 border-b border-blue-gray-100">
                       <div className="flex gap-4">
                           <EditQuestionDialog question={record} refresh={fetchQuestionsByOwner}/>
                           <Button className="flex items-center gap-3" size="sm" color="red" variant="outlined" onClick={()=>handDeleteOnClick(record.id,record.ownerId)}>
