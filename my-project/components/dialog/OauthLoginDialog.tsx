@@ -22,7 +22,7 @@ const OauthLoginDialog = () => {
     <>
       {status === "authenticated" ? (<Link href="/questions"><Button color="white">Start my journey</Button></Link> ):(   
         <>
-      <Button onClick={handleOpen} color="white" >
+      <Button size='sm' onClick={handleOpen} color="white" >
         Login
       </Button>
       <Dialog open={open} handler={handleOpen} size="xs">

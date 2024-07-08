@@ -96,7 +96,6 @@ useEffect(() => {
         if(question.reviewDate === null) return false;
         let date = new Date(question.reviewDate).setHours(0,0,0,0)
         return date <= today
-        
       })
       setActiveTabQuestions(newFilteredQuestions)
     }
@@ -160,27 +159,6 @@ useEffect(() => {
     setActiveTabQuestions(sortedArray)
   };
 
-  const sortByTitle = (type:number) =>{
-    
-  }
-
-  const sortByDifficuly = () =>{
-    
-  }
-
-  const sortByTags = () =>{
-    
-  }
-
-  const sortByNextReview = () =>{
-
-  }
-
-  const sortByLastCompletion = () =>{
-
-  }
-
-  
 
   return (
     <Card className="h-full w-full">
@@ -188,10 +166,10 @@ useEffect(() => {
         <div className="mb-8 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray">
-              Question list
+              Your leetcode database & scheduler
             </Typography>
             <Typography color="gray" className="mt-1 font-normal">
-              {session?.user?(<span color="gray" className="mt-1 font-normal">Your leetcode database & scheduler</span>):null}
+             <span color="gray" className="mt-1 font-normal">Total: {activeTabQuestions.length}</span>
             </Typography>
           </div>
           <div className="flex shrink-0 flex-col gap-2 lg:flex-row">

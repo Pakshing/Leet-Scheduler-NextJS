@@ -34,7 +34,8 @@ const Navbar = () => {
           </div>
         </div>
         {/* Secondary Div */}
-        <div className="hidden md:flex items-center space-x-1">
+        <div className="hidden md:flex items-center space-x-1 gap-4">
+          <span>Beta</span>
         {status === "authenticated" ? (
           <Button 
             color="white" 
