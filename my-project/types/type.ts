@@ -26,6 +26,7 @@ export const convertColumnTypeToQuestionType = (columnType: keyof ColumnSortingT
 //export an array of QuestionType
 export const questionTags: string[] = [
   "ARRAY",
+  "TWO POINTERS",
   'STRING',
   'LINKED LIST',
   'RECURSION',
