@@ -161,9 +161,9 @@ useEffect(() => {
 
 
   return (
-    <Card className="h-full w-full">
+    <Card className="h-full w-full flex  flex-col">
       <CardHeader floated={false} shadow={false} className="rounded-none">
-        <div className="mb-16 flex items-center justify-between gap-8">
+        <div className="mb-1 flex items-center justify-between gap-8">
           <div>
             <Typography variant="h5" color="blue-gray">
               Your leetcode database & scheduler
@@ -195,7 +195,7 @@ useEffect(() => {
           </div>
         </div>
       </CardHeader>
-      <CardBody className="overflow-scroll px-0 py-0">
+      <CardBody className="flex-1 overflow-auto px-0  py-0 ">
         <table className="w-full min-w-max table-auto text-left">
           <thead>
             <tr>
