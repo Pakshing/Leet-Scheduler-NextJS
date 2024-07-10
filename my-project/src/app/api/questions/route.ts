@@ -39,7 +39,7 @@ export async function GET(req: Request, res: NextResponse){
     const {searchParams} = new URL(req.url)
     const id = searchParams.get('ownerId')
     if(!id) return NextResponse.json({message: "No id provided"})
-    const question = await prisma.question.findMany({where: {ownerId: id}})
+    const question = await prisma.question.findMany({where: {ownerId: id},orderBy:{lastCompletion:'desc'}})
     return NextResponse.json(question)
 }
 
