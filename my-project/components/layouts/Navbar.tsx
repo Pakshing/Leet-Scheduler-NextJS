@@ -1,7 +1,7 @@
 'use client'
 import React,{useState} from 'react'
 import { useRouter } from 'next/navigation'
-import { ClockCircleOutlined } from '@ant-design/icons';
+import {CalendarOutlined } from '@ant-design/icons';
 import OauthLoginDialog from '../dialog/OauthLoginDialog';
 import { useSession, signOut} from 'next-auth/react';
 import { Button } from "@material-tailwind/react";
@@ -24,7 +24,7 @@ const Navbar = () => {
           {/* Logo Div */}
           <div className="logo m-3">
             <Link href="/" className="flex items-center">
-              <ClockCircleOutlined style={{ fontSize: '2rem' }} />
+              <CalendarOutlined  style={{ fontSize: '1.5rem' }} />
               <span className="pl-3 text-xl font-bold ">LeetCode Scheduler</span>
             </Link>
           </div>
