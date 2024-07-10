@@ -16,6 +16,7 @@ module.exports = withMT( {
         '7/10': '70%',
       },
       colors: {
+        // 'theme-color': 'rgb(26, 31, 43)',
         'theme-color': 'rgb(26, 31, 43)',
       },
     },
