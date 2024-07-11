@@ -212,7 +212,7 @@ useEffect(() => {
                     color="white"
                     className="font-normal leading-none flex items-center"
                   >
-                    <b className={head.toLowerCase() === "title" ? 'pl-2':''}>{head}</b>
+                    <b className={head.toLowerCase() === "title" ? 'pl-2':''}>{head.replace("_"," ")}</b>
                     {index !== TABLE_HEAD.length - 1 && (
                       <ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
                     )}
