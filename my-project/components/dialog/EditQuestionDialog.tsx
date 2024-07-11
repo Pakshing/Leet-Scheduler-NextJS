@@ -56,7 +56,6 @@ const EditQuestionDialog:React.FC<EditQuestionDialogProps> = ({question,refresh}
 
   const handleDfficultyChange = (value:string) => {
     setDifficulty(value);
-    console.log(value)
   }
 
   const handleCheckboxChange = (tag:string) => {
@@ -65,7 +64,6 @@ const EditQuestionDialog:React.FC<EditQuestionDialogProps> = ({question,refresh}
 
   const handleDaysReviewChange = (value:number) => {
     setDaysReview(value);
-    console.log(value)
   }
 
   const resetForm = () =>{

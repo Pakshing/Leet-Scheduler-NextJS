@@ -53,7 +53,6 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
 
   const handleDfficultyChange = (value:string) => {
     setDifficulty(value);
-    console.log(value)
   }
 
   const handleCheckboxChange = (tag:string) => {
@@ -62,7 +61,6 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
 
   const handleDaysReviewChange = (value:number) => {
     setDaysReview(value);
-    console.log(value)
   }
 
   const resetForm = () =>{
@@ -78,7 +76,6 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
   } 
 
   const handleFormSubmit = async() => {
-    console.log(inputUrl,difficulty,daysReview,checkedTags)
     if(inputUrl.format !== true) alert("Please enter a valid URL")
     else if(difficulty === "") alert("Please select a difficulty")
     else if(daysReview === undefined) alert("Please select a review date")
@@ -99,7 +96,6 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
             ownerId: session?.user?.id
           })
         });
-        console.log(response.status)
         if(response.status === 409){
           alert("Question already exists")
           return

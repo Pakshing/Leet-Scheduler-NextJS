@@ -46,7 +46,6 @@ const NextReviewDialog:React.FC<NextReviewDialogProps> = ({question,refresh}) =>
 
   const handleDaysReviewChange = (value:number) => {
     setDaysReview(value);
-    console.log(value)
   }
 
   const resetForm = () =>{

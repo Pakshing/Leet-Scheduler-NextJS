@@ -26,37 +26,35 @@ import { useSession, getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
- 
+
 const TABS = [
-  {
-    label: "Due",
-    value: "due",
-  },
-  {
-    label: "All",
-    value: "all",
-  },
-  {
-    label: "Future",
-    value: "future",
-  },
+  { label: "Due", value: "due" },
+  { label: "All", value: "all" },
+  { label: "Future", value: "future" },
 ];
- 
 
 
 export function QuestionsTable() {
   const router = useRouter();
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [activeTabQuestions, setActiveTabQuestions] = useState<QuestionType[]>([])
+  const [selectedTab, setSelectedTab] = useState(TABS[1].value);
   const [columnSorting, setColumnSorting] = useState<ColumnSortingType>(initialSortingState)
   const { data: session, status } = useSession();
 
-useEffect(() => {
-  if(status === "authenticated") fetchQuestionsByOwner()
-  if(status === "unauthenticated"){
-    router.push('/')
-  }
+  useEffect(() => {
+    if(status === "authenticated") fetchQuestionsByOwner()
+    if(status === "unauthenticated"){
+      router.push('/')
+    }
   }, [status]);
+
+  useEffect(() => {
+    handleActiveTab(selectedTab)
+    }, [questions]);
+  
+
+
 
   async function fetchQuestionsByOwner() {
     const userId = session?.user?.id;
@@ -67,8 +65,6 @@ useEffect(() => {
     });
     const data = await response.json();
     setQuestions(data);
-    setActiveTabQuestions(data)
-
   }
 
   const handDeleteOnClick = async(questionId:number,ownerId:string) =>{
@@ -90,24 +86,22 @@ useEffect(() => {
 
   const handleActiveTab = (tab:string) =>{
     const today = new Date().setHours(0,0,0,0)
-    if(tab === "DUE"){
-      const newFilteredQuestions = questions.filter(question=>{
-        console.log(question.reviewDate)
+    if(tab === "due"){
+      const newFilteredQuestions = activeTabQuestions.filter(question=>{
         if(question.reviewDate === null) return false;
         let date = new Date(question.reviewDate).setHours(0,0,0,0)
         return date <= today
       })
       setActiveTabQuestions(newFilteredQuestions)
     }
-    if(tab === "ALL"){
+    if(tab === "all"){
       setActiveTabQuestions(questions)
     }
-    if(tab === "FUTURE"){
+    if(tab === "future"){
       const newFilteredQuestions = questions.filter(question=>{
         if(question.reviewDate === null) return false;
         let date = new Date(question.reviewDate).setHours(0,0,0,0)
         return date > today
-        
       })
       setActiveTabQuestions(newFilteredQuestions)
     }
@@ -125,7 +119,6 @@ useEffect(() => {
   }
 
   const sorting = (name:keyof ColumnSortingType) =>{
-    console.log(columnSorting)
     setColumnSorting((prevState) => ({
       ...prevState,
       [name]: ((prevState[name] + 1)%3),
@@ -159,6 +152,10 @@ useEffect(() => {
     setActiveTabQuestions(sortedArray)
   };
 
+  const handleTabClick = (tabValue:string) => {
+    setSelectedTab(tabValue);
+    handleActiveTab(tabValue);
+  };
 
   return (
     <Card className="h-full w-full flex  flex-col">
@@ -184,11 +181,11 @@ useEffect(() => {
           </div>
           <Tabs value="all" className="w-full md:w-max">
             <TabsHeader>
-              {TABS.map(({ label, value, }) => (
-                <Tab key={label} value={value} onClick={()=>handleActiveTab(value.toUpperCase())}>
-                  &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                </Tab>
-              ))}
+            {TABS.map((tab) => (
+              <Tab key={tab.value} value={tab.value} onClick={() => handleTabClick(tab.value)}>
+                &nbsp;&nbsp;{tab.label}&nbsp;&nbsp;
+              </Tab>
+            ))}
             </TabsHeader>
           </Tabs>
             <AddQuestionDialog refresh={fetchQuestionsByOwner}/>
@@ -273,7 +270,7 @@ useEffect(() => {
                       >
                         <b>
                         {
-                          record.reviewDate && new Date(record.reviewDate) > new Date() 
+                          record.reviewDate 
                             ? new Date(record.reviewDate).toDateString() 
                             : "Never"
                         }
