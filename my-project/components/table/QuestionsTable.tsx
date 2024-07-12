@@ -40,7 +40,6 @@ export function QuestionsTable() {
   const [activeTabQuestions, setActiveTabQuestions] = useState<QuestionType[]>([])
   const [selectedTab, setSelectedTab] = useState(TABS[1].value);
   const [columnSorting, setColumnSorting] = useState<ColumnSortingType>(initialSortingState)
-  const [sortingColumnName, setSortingColumnName] = useState<keyof ColumnSortingType>()
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -91,7 +90,7 @@ export function QuestionsTable() {
   const handleActiveTab = (tab:string) =>{
     const today = new Date().setHours(0,0,0,0)
     let sortedQuestions : QuestionType[] = questions
-    Object.entries(sortByColumn).forEach(([key,value])=>{
+    Object.entries(columnSorting).forEach(([key,value])=>{
       if(value > 0){
         let sorted = sortByColumn(key as keyof ColumnSortingType ,value,questions)
         if(sorted) sortedQuestions = sorted
