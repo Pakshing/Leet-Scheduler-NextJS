@@ -40,6 +40,7 @@ export function QuestionsTable() {
   const [activeTabQuestions, setActiveTabQuestions] = useState<QuestionType[]>([])
   const [selectedTab, setSelectedTab] = useState(TABS[1].value);
   const [columnSorting, setColumnSorting] = useState<ColumnSortingType>(initialSortingState)
+  const [sortingColumnName, setSortingColumnName] = useState<keyof ColumnSortingType>()
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -51,12 +52,14 @@ export function QuestionsTable() {
 
   useEffect(() => {
     handleActiveTab(selectedTab)
+    console.log("handleActiveTab", "activated")
     }, [questions]);
   
 
 
 
   async function fetchQuestionsByOwner() {
+    console.log("fetchQuestionsByOwner")
     const userId = session?.user?.id;
     if(!userId) router.push('/');
     const response = await fetch(`/api/questions?ownerId=${userId}`, {
@@ -65,6 +68,7 @@ export function QuestionsTable() {
     });
     const data = await response.json();
     setQuestions(data);
+
   }
 
   const handDeleteOnClick = async(questionId:number,ownerId:string) =>{
@@ -86,19 +90,28 @@ export function QuestionsTable() {
 
   const handleActiveTab = (tab:string) =>{
     const today = new Date().setHours(0,0,0,0)
+    let sortedQuestions : QuestionType[] = questions
+    Object.entries(sortByColumn).forEach(([key,value])=>{
+      if(value > 0){
+        let sorted = sortByColumn(key as keyof ColumnSortingType ,value,questions)
+        if(sorted) sortedQuestions = sorted
+        return
+      }
+    })
     if(tab === "due"){
-      const newFilteredQuestions = activeTabQuestions.filter(question=>{
+      const newFilteredQuestions = sortedQuestions.filter(question=>{
         if(question.reviewDate === null) return false;
         let date = new Date(question.reviewDate).setHours(0,0,0,0)
         return date <= today
       })
+      
       setActiveTabQuestions(newFilteredQuestions)
     }
     if(tab === "all"){
       setActiveTabQuestions(questions)
     }
     if(tab === "future"){
-      const newFilteredQuestions = questions.filter(question=>{
+      const newFilteredQuestions = sortedQuestions.filter(question=>{
         if(question.reviewDate === null) return false;
         let date = new Date(question.reviewDate).setHours(0,0,0,0)
         return date > today
@@ -119,14 +132,21 @@ export function QuestionsTable() {
   }
 
   const sorting = (name:keyof ColumnSortingType) =>{
-    setColumnSorting((prevState) => ({
-      ...prevState,
-      [name]: ((prevState[name] + 1)%3),
-    }));
-    sortByColumn(name, (columnSorting[name] + 1) % 3);
+    setColumnSorting((prevState) => {
+      const newState = { ...prevState };
+      Object.keys(newState).forEach((key) => {
+        if (key !== name) {
+          newState[key as keyof ColumnSortingType] = 0;
+        }
+      });
+      newState[name] = (prevState[name] + 1) % 3;
+      return newState;
+    });
+    const sorted = sortByColumn(name, (columnSorting[name] + 1) % 3,activeTabQuestions);
+    if(sorted)setActiveTabQuestions(sorted)
   }
 
-  const sortByColumn = (name: keyof ColumnSortingType, type: number) => {
+  const sortByColumn = (name: keyof ColumnSortingType, type: number, questions: QuestionType[]) => {
     const typedName = convertColumnTypeToQuestionType(name)
     let sortedArray = [...questions];
     if(sortedArray.length === 0) return
@@ -149,7 +169,7 @@ export function QuestionsTable() {
     } else {
       sortedArray = questions;
     }
-    setActiveTabQuestions(sortedArray)
+    return sortedArray
   };
 
   const handleTabClick = (tabValue:string) => {
