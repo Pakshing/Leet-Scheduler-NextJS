@@ -67,7 +67,6 @@ export function QuestionsTable() {
     });
     const data = await response.json();
     setQuestions(data);
-
   }
 
   const handDeleteOnClick = async(questionId:number,ownerId:string) =>{
