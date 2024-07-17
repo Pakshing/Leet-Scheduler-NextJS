@@ -67,7 +67,7 @@ const NextReviewDialog: React.FC<NextReviewDialogProps> = ({ question, refresh }
     <>
       <a href={question.url} target="_blank" rel="noopener noreferrer" className="inline-block">
         <Button 
-          className="px-2 py-1 text-xs sm:text-sm md:text-base whitespace-normal text-left" 
+          className="px-2 py-1 text-xs sm:text-sm  whitespace-normal text-left" 
           variant="text" 
           size="sm" 
           onClick={handleOpen}
