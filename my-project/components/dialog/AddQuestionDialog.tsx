@@ -125,7 +125,7 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
         size="lg" 
         className="max-h-[90vh] w-[95%] sm:w-[85%] md:w-[75%] lg:w-[60%] flex flex-col"
       >
-        <DialogBody className="p-2 sm:p-4 overflow-y-auto flex-grow">
+        <DialogBody className="m-2 sm:p-4 overflow-y-auto flex-grow">
           <form className="mb-2" onSubmit={(e) => { e.preventDefault(); handleFormSubmit(); }}>
             <div className="flex flex-col gap-4 sm:gap-6">
               <Typography variant="h6" color="blue-gray" className="text-base sm:text-lg">
@@ -134,7 +134,7 @@ const AddQuestionDialog:React.FC<AddQuestionDialogProps> = ({refresh}) => {
               <Input
                 size="lg"
                 placeholder="https://leetcode.com/problems/two-sum/description"
-                className="!border-t-blue-gray-200 focus:!border-t-gray-900 text-sm sm:text-base"
+                className="!border-t-blue-gray-200 focus:!border-t-gray-900"
                 crossOrigin={""}
                 value={inputUrl.url}
                 onChange={(e) => handleUrlInput(e.target.value)}

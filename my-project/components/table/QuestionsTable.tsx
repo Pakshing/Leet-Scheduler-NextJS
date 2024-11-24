@@ -32,6 +32,7 @@ const TABS = [
   { label: "All", value: "all" },
   { label: "Future", value: "future" },
 ];
+ 
 
 
 export function QuestionsTable() {
@@ -49,16 +50,10 @@ export function QuestionsTable() {
     }
   }, [status]);
 
-  useEffect(() => {
-    handleActiveTab(selectedTab)
-    console.log("handleActiveTab", "activated")
-    }, [questions]);
-  
 
 
 
   async function fetchQuestionsByOwner() {
-    console.log("fetchQuestionsByOwner")
     const userId = session?.user?.id;
     if(!userId) router.push('/');
     const response = await fetch(`/api/questions?ownerId=${userId}`, {
@@ -67,6 +62,7 @@ export function QuestionsTable() {
     });
     const data = await response.json();
     setQuestions(data);
+    setActiveTabQuestions(data)
   }
 
   const handDeleteOnClick = async(questionId:number,ownerId:string) =>{
@@ -106,7 +102,8 @@ export function QuestionsTable() {
       setActiveTabQuestions(newFilteredQuestions)
     }
     if(tab === "all"){
-      setActiveTabQuestions(questions)
+
+      setActiveTabQuestions(sortedQuestions)
     }
     if(tab === "future"){
       const newFilteredQuestions = sortedQuestions.filter(question=>{
@@ -129,6 +126,7 @@ export function QuestionsTable() {
     }    
   }
 
+  
   const sorting = (name:keyof ColumnSortingType) =>{
     setColumnSorting((prevState) => {
       const newState = { ...prevState };
@@ -137,10 +135,10 @@ export function QuestionsTable() {
           newState[key as keyof ColumnSortingType] = 0;
         }
       });
-      newState[name] = (prevState[name] + 1) % 3;
+      newState[name] = (newState[name] + 1) % 3;
       return newState;
     });
-    const sorted = sortByColumn(name, (columnSorting[name] + 1) % 3,activeTabQuestions);
+    const sorted = sortByColumn(name, (columnSorting[name] + 1) % 3, questions);
     if(sorted)setActiveTabQuestions(sorted)
   }
 
@@ -247,7 +245,7 @@ export function QuestionsTable() {
                   : "p-4 border-b border-blue-gray-50";
  
                 return (
-                  <tr key={record.id}>
+                  <tr key={index}>
                     <td className= {columnSorting["Title"] === 0? "p-4 border-b border-blue-gray-100" : "p-4 border-b border-blue-gray-200 bg-gray-200"} >
                           <Typography
                             variant="small"
